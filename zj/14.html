@@ -20,23 +20,20 @@
             background: #000;
             overflow-x: hidden;
             padding: 60px 20px 80px;
-            /* 文字抗锯齿，杜绝发虚 */
             -webkit-font-smoothing: antialiased;
-            transform: translateZ(1px);
         }
-        /* 视频单独图层，改用scale缩小实现朦胧，放弃blur滤镜 */
+        /* 视频和背景都不做任何虚化处理 */
         .video-wrap-bg{
             position:fixed;
             inset:0;
             z-index:-2;
-            overflow:hidden;
-            opacity:0.7;
+            opacity: 0.7;
         }
         #bg-video{
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%,-50%) scale(1.15);
+            transform: translate(-50%,-50%);
             min-width: 100%;
             min-height: 100%;
             width: auto;
@@ -207,7 +204,7 @@
         <div class="music-text">嘘，认真把音乐听完</div>
     </div>
 
-    <!-- 去掉blur，靠放大溢出做模糊观感，彻底隔离文字 -->
+    <!-- 完全不做任何虚化处理 -->
     <div class="video-wrap-bg">
         <video id="bg-video" autoplay loop muted playsinline webkit-playsinline>
             <source src="1.mp4" type="video/mp4">
