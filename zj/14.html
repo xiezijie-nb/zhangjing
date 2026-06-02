@@ -20,8 +20,6 @@
             background: #000;
             overflow-x: hidden;
             padding: 60px 20px 80px;
-            will-change: scroll-position;
-            transform: translateZ(0);
         }
         #bg-video{
             position: fixed;
@@ -36,7 +34,6 @@
             filter: blur(12px) brightness(0.6);
             opacity: 0.7;
             object-fit: cover;
-            will-change: opacity;
         }
         .bg-layer{
             position: fixed;
@@ -49,7 +46,6 @@
             animation: bgMove 12s ease infinite;
             z-index: -1;
             opacity: 0.5;
-            will-change: background-position;
         }
         @keyframes bgMove {
             0%{background-position:0% 50%;}
@@ -64,7 +60,6 @@
             height: 100%;
             pointer-events: none;
             z-index: 1;
-            will-change: contents;
         }
         .tip{
             color: #666;
@@ -78,7 +73,6 @@
             z-index: 2;
             position: relative;
             text-align: center;
-            will-change: transform, opacity;
         }
         .tip.ready{
             color: #fff;
@@ -102,7 +96,6 @@
             z-index: 2;
             position: relative;
             max-width: 100%;
-            will-change: transform;
         }
         .video-wrap img {
             width: 500px;
@@ -112,7 +105,6 @@
             transition: all 1s ease;
             opacity: 1;
             transform: scale(1) translateX(0) translateY(0);
-            will-change: transform, opacity;
         }
         .page-num{
             position: absolute;
@@ -128,6 +120,7 @@
     margin-top: 30px;
     font-size: 18px;
     line-height: 1.8;
+    /* 渐变文字核心代码 */
     background: linear-gradient(45deg,#ff88aa,#ffd1dc,#ffffff);
     -webkit-background-clip: text;
     color: transparent;
@@ -139,7 +132,6 @@
     text-align: center;
     display: none;
     position: relative;
-    will-change: contents;
 }
         .love-box{
             margin-top: 20px;
@@ -155,7 +147,6 @@
             transition: all 0.3s ease;
             user-select: none;
             padding: 10px 20px;
-            will-change: transform;
         }
         .heart.active{
             color: #ff4466;
@@ -209,7 +200,7 @@
         <div class="music-text">嘘，认真把音乐听完</div>
     </div>
 
-    <video id="bg-video" autoplay loop muted playsinline webkit-playsinline>
+    <video id="bg-video" autoplay loop muted>
         <source src="1.mp4" type="video/mp4">
     </video>
 
@@ -219,7 +210,7 @@
     <div class="tip" id="startText">加载中，请耐心等待哟~</div>
 
     <div class="video-wrap" id="videoBox" style="display:none;">
-        <img id="pic" src="3.jpg" alt="" decoding="async">
+        <img id="pic" src="3.jpg" alt="">
         <div class="page-num" id="pageNum">1/11</div>
     </div>
 
@@ -253,6 +244,7 @@ const loveBox = document.getElementById('loveBox');
 const heart = document.getElementById('heart');
 let isLike = false;
 
+// 爱心点击
 function toggleHeart(){
     isLike = !isLike;
     heart.classList.toggle('active', isLike);
@@ -263,17 +255,19 @@ heart.addEventListener('touchstart', function(e){
     toggleHeart();
 }, {passive:false});
 
+// 粒子
 const canvas = document.getElementById('particles');
 const ctx = canvas.getContext('2d');
 let w, h, particles = [];
 function resize(){w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight;}
 resize();
 window.addEventListener('resize',resize);
-class Particle{constructor(x,y){this.x=x;this.y=y;this.r=Math.random()*2+1;this.alpha=1;this.vx=(Math.random()-0.5)*1.2;this.vy=(Math.random()-0.5)*1.2;}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,180,220,${this.alpha})`;}update(){this.x+=this.vx;this.y+=this.vy;this.alpha-=0.015;}}
-window.addEventListener('mousemove',e=>{for(let i=0;i<3;i++)particles.push(new Particle(e.clientX,e.clientY));});
-function animate(){ctx.clearRect(0,0,w,h);for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.draw();p.update();if(p.alpha<=0)particles.splice(i,1);}if(particles.length>150)particles=particles.slice(-150);requestAnimationFrame(animate);}
+class Particle{constructor(x,y){this.x=x;this.y=y;this.r=Math.random()*3+1;this.alpha=1;this.vx=(Math.random()-0.5)*2;this.vy=(Math.random()-0.5)*2;}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,180,220,${this.alpha})`;}update(){this.x+=this.vx;this.y+=this.vy;this.alpha-=0.02;}}
+window.addEventListener('mousemove',e=>{for(let i=0;i<5;i++)particles.push(new Particle(e.clientX,e.clientY));});
+function animate(){ctx.clearRect(0,0,w,h);for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.draw();p.update();if(p.alpha<=0)particles.splice(i,1);}requestAnimationFrame(animate);}
 animate();
 
+// 图片：3~13.jpg 共11张
 let box = document.getElementById('videoBox');
 let img = document.getElementById('pic');
 let desc = document.getElementById('descText');
@@ -281,18 +275,21 @@ let pageNum = document.getElementById('pageNum');
 const imgList = [3,4,5,6,7,8,9,10,11,12,13];
 const totalImg = imgList.length;
 
+// 计数：图片 + 音频 + 背景视频
 let loadCount = 0;
+// 总需要等待的资源数量
 const totalNeedLoad = imgList.length + 2;
 
+// 预加载所有图片
 imgList.forEach(item=>{
     let temp=new Image();
-    temp.decoding="async";
     temp.src=item+".jpg";
     temp.onload = temp.onerror = function(){
         loadComplete();
     }
 });
 
+// 统一加载完成计数
 function loadComplete(){
     loadCount++;
     if(loadCount >= totalNeedLoad){
@@ -302,21 +299,22 @@ function loadComplete(){
     }
 }
 
+// 等待背景视频加载
 bgVideo.addEventListener('canplaythrough', function(){
     loadComplete();
 });
 
+// 初始化音频
 window.onload = function(){
-    setTimeout(()=>{
-        bgMusic = new Audio("2.mp3");
-        bgMusic.loop = true;
-        bgMusic.preload = "none";
-        bgMusic.oncanplaythrough = function(){
-            loadComplete();
-        };
-    },300);
+    bgMusic = new Audio("2.mp3");
+    bgMusic.loop = true;
+    bgMusic.preload = "auto";
+    bgMusic.oncanplaythrough = function(){
+        loadComplete();
+    };
 };
 
+// 加载完才绑定点击
 function bindClick(){
     startText.onclick = function(){
         this.style.display = 'none';
