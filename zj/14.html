@@ -20,32 +20,28 @@
             background: #000;
             overflow-x: hidden;
             padding: 60px 20px 80px;
-            transform: translateZ(0);
+            /* 文字抗锯齿，杜绝发虚 */
             -webkit-font-smoothing: antialiased;
+            transform: translateZ(1px);
         }
-        /*新增外层容器，模糊移到这里*/
-        .video-blur-wrap{
+        /* 视频单独图层，改用scale缩小实现朦胧，放弃blur滤镜 */
+        .video-wrap-bg{
             position:fixed;
-            top:0;
-            left:0;
-            width:100%;
-            height:100%;
+            inset:0;
             z-index:-2;
-            filter: blur(12px) brightness(0.6);
-            opacity: 0.7;
+            overflow:hidden;
+            opacity:0.7;
         }
         #bg-video{
-            position: fixed;
+            position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%,-50%);
+            transform: translate(-50%,-50%) scale(1.15);
             min-width: 100%;
             min-height: 100%;
             width: auto;
             height: auto;
             object-fit: cover;
-            filter:none !important;
-            opacity:1 !important;
         }
         .bg-layer{
             position: fixed;
@@ -132,7 +128,6 @@
     margin-top: 30px;
     font-size: 18px;
     line-height: 1.8;
-    /* 渐变文字核心代码 */
     background: linear-gradient(45deg,#ff88aa,#ffd1dc,#ffffff);
     -webkit-background-clip: text;
     color: transparent;
@@ -212,8 +207,8 @@
         <div class="music-text">嘘，认真把音乐听完</div>
     </div>
 
-    <!--视频套一层div，只改这里-->
-    <div class="video-blur-wrap">
+    <!-- 去掉blur，靠放大溢出做模糊观感，彻底隔离文字 -->
+    <div class="video-wrap-bg">
         <video id="bg-video" autoplay loop muted playsinline webkit-playsinline>
             <source src="1.mp4" type="video/mp4">
         </video>
