@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>大方刘亦菲</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body{
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: #000;
+            overflow-x: hidden;
+            padding: 60px 20px 80px;
+        }
+        #bg-video{
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -2;
+            filter: blur(12px) brightness(0.6);
+            opacity: 0.7;
+            object-fit: cover;
+        }
+        .bg-layer{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(-45deg, #1a1024, #201b35, #101828, #251c3a);
+            background-size: 400% 400%;
+            animation: bgMove 12s ease infinite;
+            z-index: -1;
+            opacity: 0.5;
+        }
+        @keyframes bgMove {
+            0%{background-position:0% 50%;}
+            50%{background-position:100% 50%;}
+            100%{background-position:0% 50%;}
+        }
+        #particles{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .tip{
+            color: #666;
+            font-size: 28px;
+            font-family: "Microsoft Yahei", sans-serif;
+            letter-spacing: 4px;
+            cursor: not-allowed;
+            margin-bottom: 30px;
+            text-shadow: none;
+            transition: all 0.5s ease;
+            z-index: 2;
+            position: relative;
+            text-align: center;
+        }
+        .tip.ready{
+            color: #fff;
+            cursor: pointer;
+            text-shadow: 0 0 8px #ff88aa, 0 0 15px #ff88aa;
+        }
+        .tip.ready:hover {
+            color: #ff88aa;
+            transform: scale(1.08);
+            text-shadow: 0 0 12px #ff88aa, 0 0 20px #ff88aa;
+        }
+        .video-wrap{
+            border:10px solid #ff88aa33;
+            border-radius:15px;
+            padding:0;
+            display:inline-block;
+            line-height:0;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(255,136,170,0.3), 
+                        0 0 50px rgba(136,102,255,0.2);
+            z-index: 2;
+            position: relative;
+            max-width: 100%;
+        }
+        .video-wrap img {
+            width: 500px;
+            max-width: 100%;
+            height: 600px;
+            display: block;
+            transition: all 1s ease;
+            opacity: 1;
+            transform: scale(1) translateX(0) translateY(0);
+        }
+        .page-num{
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            font-size: 18px;
+            color: #fff;
+            text-shadow: 0 0 5px #000;
+            z-index: 3;
+            display: none;
+        }
+.img-desc{
+    margin-top: 30px;
+    font-size: 18px;
+    line-height: 1.8;
+    /* 渐变文字核心代码 */
+    background: linear-gradient(45deg,#ff88aa,#ffd1dc,#ffffff);
+    -webkit-background-clip: text;
+    color: transparent;
+    letter-spacing: 1px;
+    text-shadow: 0 0 6px #ff88aa;
+    width: 500px;
+    max-width: 100%;
+    z-index: 2;
+    text-align: center;
+    display: none;
+    position: relative;
+}
+        .love-box{
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+        .heart{
+            font-size: 40px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            padding: 10px 20px;
+        }
+        .heart.active{
+            color: #ff4466;
+            transform: scale(1.2);
+        }
+        .love-text{
+            color: #fff;
+            font-size: 14px;
+            margin-top: 8px;
+            text-shadow: 0 0 3px #ff88aa;
+        }
+        .music-box{
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+            text-align: center;
+            display: none;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 12px;
+        }
+        .music-btn{
+            padding: 5px 14px;
+            background: rgba(255,136,170,0.7);
+            color: #fff;
+            border: none;
+            border-radius: 15px;
+            font-size: 14px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .music-progress{
+            width: 120px;
+            cursor: pointer;
+        }
+        .music-text{
+            color: #fff;
+            font-size: 12px;
+            margin-top: 6px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 3px #ff88aa;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="music-box" id="musicBox">
+        <button class="music-btn" id="musicBtn">暂停音乐</button>
+        <input type="range" class="music-progress" id="musicProgress" min="0" max="100" value="0">
+        <div class="music-text">嘘，认真把音乐听完</div>
+    </div>
+
+    <video id="bg-video" autoplay loop muted>
+        <source src="1.mp4" type="video/mp4">
+    </video>
+
+    <div class="bg-layer"></div>
+    <canvas id="particles"></canvas>
+
+    <div class="tip" id="startText">加载中，请耐心等待哟~</div>
+
+    <div class="video-wrap" id="videoBox" style="display:none;">
+        <img id="pic" src="3.jpg" alt="">
+        <div class="page-num" id="pageNum">1/11</div>
+    </div>
+
+    <div id="descText" class="img-desc">
+本人简介：<br>
+大家好！我叫张婧，他们都叫我大方刘亦菲<br>
+人见人爱，花见花开，车见车爆胎的大美女一枚。<br>
+在线找对象，要求如下：<br>
+180cm以上，有八块腹肌，有车有房，卡颜，没有不良嗜好，要处处顺着我，把我捧在手心，要好好爱我，舍得给我花钱。（注：丑的敢来就死定了）<br>
+实在没有的话，点赞里抽一个跟我处对象，没抽到也没关系，硬要跟我处的也可以。<br>
+本人很内向，看到帅哥不敢直接亲。<br>
+我眼里有光，医生说是散光。<br>
+没有动态的日子里，我不是忙，而是拍的照太丑。<br>
+有意的私wx:zzz007618   
+    </div>
+
+    <div class="love-box" id="loveBox">
+        <div class="heart" id="heart">❤</div>
+        <div class="love-text">点个小心心支持一下</div>
+    </div>
+
+<script>
+let bgMusic;
+const musicBtn = document.getElementById('musicBtn');
+const musicBox = document.getElementById('musicBox');
+const musicProgress = document.getElementById('musicProgress');
+const startText = document.getElementById('startText');
+const bgVideo = document.getElementById('bg-video');
+
+const loveBox = document.getElementById('loveBox');
+const heart = document.getElementById('heart');
+let isLike = false;
+
+// 爱心点击
+function toggleHeart(){
+    isLike = !isLike;
+    heart.classList.toggle('active', isLike);
+}
+heart.addEventListener('click', toggleHeart);
+heart.addEventListener('touchstart', function(e){
+    e.preventDefault();
+    toggleHeart();
+}, {passive:false});
+
+// 粒子
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let w, h, particles = [];
+function resize(){w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight;}
+resize();
+window.addEventListener('resize',resize);
+class Particle{constructor(x,y){this.x=x;this.y=y;this.r=Math.random()*3+1;this.alpha=1;this.vx=(Math.random()-0.5)*2;this.vy=(Math.random()-0.5)*2;}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,180,220,${this.alpha})`;}update(){this.x+=this.vx;this.y+=this.vy;this.alpha-=0.02;}}
+window.addEventListener('mousemove',e=>{for(let i=0;i<5;i++)particles.push(new Particle(e.clientX,e.clientY));});
+function animate(){ctx.clearRect(0,0,w,h);for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.draw();p.update();if(p.alpha<=0)particles.splice(i,1);}requestAnimationFrame(animate);}
+animate();
+
+// 图片：3~13.jpg 共11张
+let box = document.getElementById('videoBox');
+let img = document.getElementById('pic');
+let desc = document.getElementById('descText');
+let pageNum = document.getElementById('pageNum');
+const imgList = [3,4,5,6,7,8,9,10,11,12,13];
+const totalImg = imgList.length;
+
+// 计数：图片 + 音频 + 背景视频
+let loadCount = 0;
+// 总需要等待的资源数量
+const totalNeedLoad = imgList.length + 2;
+
+// 预加载所有图片
+imgList.forEach(item=>{
+    let temp=new Image();
+    temp.src=item+".jpg";
+    temp.onload = temp.onerror = function(){
+        loadComplete();
+    }
+});
+
+// 统一加载完成计数
+function loadComplete(){
+    loadCount++;
+    if(loadCount >= totalNeedLoad){
+        startText.innerText = "点击观看\n大方刘亦菲";
+        startText.classList.add("ready");
+        bindClick();
+    }
+}
+
+// 等待背景视频加载
+bgVideo.addEventListener('canplaythrough', function(){
+    loadComplete();
+});
+
+// 初始化音频
+window.onload = function(){
+    bgMusic = new Audio("2.mp3");
+    bgMusic.loop = true;
+    bgMusic.preload = "auto";
+    bgMusic.oncanplaythrough = function(){
+        loadComplete();
+    };
+};
+
+// 加载完才绑定点击
+function bindClick(){
+    startText.onclick = function(){
+        this.style.display = 'none';
+        box.style.display = 'inline-block';
+        desc.style.display = 'block';
+        loveBox.style.display = 'block';
+        pageNum.style.display = 'block';
+        pageNum.innerText = `${1}/${totalImg}`;
+
+        musicBox.style.display = 'block';
+        bgMusic.play().catch(()=>{});
+
+        bgMusic.ontimeupdate = function(){
+            if(bgMusic.duration){
+                let per = (bgMusic.currentTime / bgMusic.duration) * 100;
+                musicProgress.value = per;
+            }
+        };
+        musicProgress.oninput = function(){
+            if(bgMusic.duration){
+                let time = (musicProgress.value / 100) * bgMusic.duration;
+                bgMusic.currentTime = time;
+            }
+        };
+        musicBtn.onclick = function(){
+            if(bgMusic.paused){
+                bgMusic.play();
+                musicBtn.innerText = "暂停音乐";
+            }else{
+                bgMusic.pause();
+                musicBtn.innerText = "播放音乐";
+            }
+        };
+
+        let num = 0;
+        let effectArr = [{x:0,y:0,scale:0.9,opacity:0},{x:80,y:0,scale:1,opacity:0},{x:0,y:80,scale:1,opacity:0},{x:0,y:0,scale:1.15,opacity:0},{x:-80,y:0,scale:1,opacity:0},{x:0,y:-80,scale:1,opacity:0},{x:0,y:0,scale:0.8,opacity:0},{x:0,y:40,scale:0.95,opacity:0}];
+        let idx = 0;
+        setInterval(()=>{
+            let e = effectArr[idx % effectArr.length];
+            idx++;
+            img.style.opacity = e.opacity;
+            img.style.transform = `translate(${e.x}px,${e.y}px) scale(${e.scale})`;
+            setTimeout(()=>{
+                num = (num+1) % totalImg;
+                img.src = `${imgList[num]}.jpg`;
+                pageNum.innerText = `${num+1}/${totalImg}`;
+                img.style.opacity = 1;
+                img.style.transform = `translate(0,0) scale(1)`;
+            },700);
+        },3500);
+    }
+}
+</script>
+</body>
+</html>
